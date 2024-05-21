@@ -9,6 +9,7 @@ import tech.kitucode.employee.model.Attendance;
 import tech.kitucode.employee.model.enumerations.Status;
 import tech.kitucode.employee.service.AttendanceService;
 import tech.kitucode.employee.service.dto.AttendanceDTO;
+import tech.kitucode.employee.service.dto.AttendanceReport;
 import tech.kitucode.employee.service.dto.AttendanceReportDTO;
 
 import java.time.LocalDate;
@@ -32,22 +33,30 @@ public class AttendanceController {
 
     @GetMapping("/filter")
     public ResponseEntity<List<AttendanceDTO>> filter(@RequestParam(required = false, name = "idNumber") String idNumber,
-                                                   @RequestParam(required = false, name = "status") String status,
-                                                   @RequestParam(required = false, name = "date") LocalDate date,
-                                                   Pageable pageable) {
+                                                      @RequestParam(required = false, name = "status") String status,
+                                                      @RequestParam(required = false, name = "date") LocalDate date,
+                                                      Pageable pageable) {
 
         Status statusEnumValue = null;
-        try{
+        try {
             statusEnumValue = Status.valueOf(status);
-        }catch (Exception igore){
+        } catch (Exception igore) {
 
         }
 
-        Page<AttendanceDTO> attendanceList = attendanceService.filter(idNumber, statusEnumValue,date, pageable);
+        Page<AttendanceDTO> attendanceList = attendanceService.filter(idNumber, statusEnumValue, date, pageable);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-Total-Count", Long.toString(attendanceList.getTotalElements()));
 
         return ResponseEntity.ok().headers(headers).body(attendanceList.getContent());
+    }
+
+    @GetMapping("/report")
+    public ResponseEntity<List<AttendanceReport>> report(@RequestParam(name = "startDate") LocalDate startDate,
+                                                         @RequestParam(name = "endDate") LocalDate endDate) {
+        List<AttendanceReport> attendanceReport = attendanceService.extractReport(startDate, endDate);
+
+        return ResponseEntity.ok(attendanceReport);
     }
 }

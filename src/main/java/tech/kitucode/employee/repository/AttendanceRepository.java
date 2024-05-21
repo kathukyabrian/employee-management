@@ -15,4 +15,5 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>, J
     List<Attendance> findByUserIdAndDate(Long userId, LocalDate date);
     List<Attendance> findByUserId(Long userId);
     List<Attendance> findByUserIdAndStatus(Long userId, Status status);
+    List<Attendance> findByDateBetween(LocalDate startDate, LocalDate endDate);
 }
